@@ -11,6 +11,12 @@ const getHeaders = () => {
   };
 };
 
+export const fetchCountries = async () => {
+  const response = await fetch(`${API_BASE}/countries`);
+  if (!response.ok) return [];
+  return response.json();
+};
+
 export const extractReceipt = async (file) => {
   if (MOCK_MODE) {
     await delay(2000); // 2-second simulated OCR scanning
@@ -45,7 +51,8 @@ export const submitExpense = async (data) => {
   
   const payload = {
     amount: parseFloat(data.amount) || 0,
-    currency: "USD",
+    currency: data.currency || "USD",
+    vendor: data.vendor || "Unknown Vendor",
     category: data.category || "General",
     description: data.notes || "Receipt submission",
     date: data.date || new Date().toISOString().split('T')[0]
@@ -81,8 +88,9 @@ export const getMyExpenses = async () => {
   const data = await response.json();
   return data.map(exp => ({
     id: exp.id,
-    vendor: exp.category || 'General',
+    vendor: exp.vendor || 'Unknown Vendor',
     amount: exp.amount,
+    currency: exp.currency || 'USD',
     status: exp.status,
     date: exp.date
   }));

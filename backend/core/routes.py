@@ -19,7 +19,14 @@ router = APIRouter()
 @router.post("/auth/register", status_code=status.HTTP_201_CREATED)
 def register(user_data: UserCreate, db: Session = Depends(get_db)):
     try:
-        return register_user(db, user_data.name, user_data.email, user_data.password)
+        return register_user(
+            db, 
+            user_data.name, 
+            user_data.email, 
+            user_data.password, 
+            user_data.company_name, 
+            user_data.country
+        )
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
 
@@ -29,6 +36,21 @@ def login(user_data: UserLogin, db: Session = Depends(get_db)):
         return login_user(db, user_data.email, user_data.password)
     except ValueError as e:
         raise HTTPException(status_code=401, detail=str(e))
+
+
+# --- META ROUTES ---
+
+from .countries import fetch_countries
+
+@router.get("/countries")
+def get_supported_countries():
+    """
+    Returns list of countries along with normalized currency data.
+    """
+    try:
+        return fetch_countries()
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 
 # --- USERS ROUTES ---
@@ -132,8 +154,10 @@ def fetch_pending_approvals(db: Session = Depends(get_db), current_manager = Dep
             "id": str(approval.id), 
             "expense_id": str(expense.id),
             "employee_name": user.name if user else "Unknown User",
-            "vendor": expense.category, 
+            "vendor": expense.vendor,
             "amount": expense.amount,
+            "currency": expense.currency,
+            "converted_amount": expense.converted_amount,
             "date": str(expense.date) if expense.date else None,
             "category": expense.category,
             "status": expense.status.value,

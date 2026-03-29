@@ -8,6 +8,8 @@ class UserCreate(BaseModel):
     name: str
     email: EmailStr
     password: str
+    company_name: Optional[str] = None
+    country: Optional[str] = None
 
 class UserLogin(BaseModel):
     email: EmailStr
@@ -29,6 +31,7 @@ class ExpenseCreate(BaseModel):
     amount: float
     currency: str
     category: str
+    vendor: str
     description: str
     date: date
 
@@ -39,6 +42,7 @@ class ExpenseOut(BaseModel):
     currency: str
     converted_amount: Optional[float]
     category: Optional[str]
+    vendor: Optional[str]
     description: Optional[str]
     date: Optional[date]
     status: Optional[StatusEnum]

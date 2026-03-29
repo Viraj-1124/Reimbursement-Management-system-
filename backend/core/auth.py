@@ -39,25 +39,46 @@ def create_access_token(data: dict, expires_delta: timedelta | None = None):
     encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
     return encoded_jwt
 
-def register_user(db: Session, name: str, email: str, password: str) -> dict:
+def register_user(db: Session, name: str, email: str, password: str, company_name: str = None, country: str = None) -> dict:
     """
     - Hash password
+    - Create Company if provided
     - Create user
     - Generate JWT token
     Returns:
     {"user_id": str, "token": str}
     """
+    from .countries import get_currency_for_country
+    from .models import Company
+
     db_user = db.query(User).filter(User.email == email).first()
     if db_user:
         raise ValueError("Email already registered")
         
     hashed_pwd = get_password_hash(password)
-    new_user = User(
-        name=name,
-        email=email,
-        password_hash=hashed_pwd,
-        role=RoleEnum.EMPLOYEE # Default role
-    )
+    
+    # Company Admin Signup Flow
+    if company_name:
+        default_curr = get_currency_for_country(country) if country else "USD"
+        new_company = Company(name=company_name, default_currency=default_curr)
+        db.add(new_company)
+        db.commit()
+        db.refresh(new_company)
+        
+        new_user = User(
+            name=name,
+            email=email,
+            password_hash=hashed_pwd,
+            role=RoleEnum.ADMIN,
+            company_id=new_company.id
+        )
+    else:
+        new_user = User(
+            name=name,
+            email=email,
+            password_hash=hashed_pwd,
+            role=RoleEnum.EMPLOYEE # Default role
+        )
     db.add(new_user)
     db.commit()
     db.refresh(new_user)

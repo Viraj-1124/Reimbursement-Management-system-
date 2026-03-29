@@ -19,6 +19,7 @@ def submit_expense(db: Session, user_id: str, data: dict) -> dict:
         amount=data.get("amount"),
         currency=data.get("currency"),
         category=data.get("category"),
+        vendor=data.get("vendor"),
         description=data.get("description"),
         date=data.get("date"),
         status=StatusEnum.PENDING
@@ -26,7 +27,14 @@ def submit_expense(db: Session, user_id: str, data: dict) -> dict:
     
     user = db.query(User).filter(User.id == user_id).first()
     if user and user.company_id:
-        new_expense.converted_amount = data.get("amount")
+        from .models import Company
+        company = db.query(Company).filter(Company.id == user.company_id).first()
+        if company and company.default_currency and company.default_currency.upper() != new_expense.currency.upper():
+            new_expense.converted_amount = convert_currency(new_expense.amount, new_expense.currency, company.default_currency)
+        else:
+            new_expense.converted_amount = new_expense.amount
+    else:
+        new_expense.converted_amount = new_expense.amount
 
     # Get risk score from AI Engine
     # Build complete dict for AI engine (can expand later)
@@ -60,22 +68,21 @@ def get_user_expenses(db: Session, user_id: str) -> list:
 
 def convert_currency(amount: float, from_curr: str, to_curr: str) -> float:
     """
-    - Use external API
+    - Use external API via backend.core.exchange
     Returns:
     float
     """
-    # Mock for external API exchange rate
-    if from_curr == to_curr:
+    from backend.core.exchange import get_exchange_rates
+    
+    if from_curr.upper() == to_curr.upper():
         return amount
         
-    mock_rates = {
-        "USD": 1.0,
-        "EUR": 0.85,
-        "INR": 83.0
-    }
+    rates = get_exchange_rates(from_curr.upper())
+    target_rate = rates.get(to_curr.upper())
     
-    # Convert to USD first, then to target currency
-    amount_in_usd = amount / mock_rates.get(from_curr, 1.0)
-    converted = amount_in_usd * mock_rates.get(to_curr, 1.0)
-    
+    if not target_rate:
+        # Fallback if exchange rate is missing
+        return amount
+        
+    converted = amount * target_rate
     return round(converted, 2)

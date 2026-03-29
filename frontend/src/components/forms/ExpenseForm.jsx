@@ -1,14 +1,23 @@
 import { useState, useEffect } from 'react';
 import { Sparkles } from 'lucide-react';
+import { fetchCountries } from '../../services/api';
 
 export default function ExpenseForm({ initialData = {}, onSubmit, isSubmitting }) {
   const [formData, setFormData] = useState({
     amount: '',
+    currency: 'USD',
     date: '',
     vendor: '',
     category: '',
     description: ''
   });
+
+  const [countries, setCountries] = useState([]);
+  const uniqueCurrencies = Array.from(new Map(countries.map(c => [c.currency_code, c])).values());
+
+  useEffect(() => {
+    fetchCountries().then(data => setCountries(data));
+  }, []);
 
   const [errors, setErrors] = useState({});
 
@@ -62,24 +71,39 @@ export default function ExpenseForm({ initialData = {}, onSubmit, isSubmitting }
 
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-md">
-      <div>
-        <label style={labelStyle}>
-          Amount ($)
-          {initialData.confidence && (
-            <span className="badge badge-success flex items-center gap-sm" style={{ fontSize: '0.75rem', fontWeight: 500 }}>
-              <Sparkles size={12} /> AI Extracted ({(initialData.confidence * 100).toFixed(0)}%)
-            </span>
-          )}
-        </label>
-        <input 
-          type="number" 
-          step="0.01"
-          style={{ ...inputStyle, borderColor: errors.amount ? 'var(--color-danger-text)' : 'var(--color-border)' }}
-          value={formData.amount}
-          onChange={(e) => setFormData({...formData, amount: e.target.value})}
-          placeholder="0.00"
-        />
-        {errors.amount && <span style={{ color: 'var(--color-danger-text)', fontSize: '0.8rem', display: 'block', marginTop: '4px' }}>{errors.amount}</span>}
+      <div className="flex gap-md w-full">
+        <div style={{ width: '120px', flexShrink: 0 }}>
+          <label style={labelStyle}>Currency</label>
+          <select 
+            style={inputStyle}
+            value={formData.currency}
+            onChange={(e) => setFormData({...formData, currency: e.target.value})}
+          >
+            <option value="USD">USD ($)</option>
+            {uniqueCurrencies.filter(c => c.currency_code !== 'USD').map(c => (
+              <option key={c.currency_code} value={c.currency_code}>{c.currency_code} ({c.currency_symbol || c.currency_code})</option>
+            ))}
+          </select>
+        </div>
+        <div style={{ flex: 1 }}>
+          <label style={labelStyle}>
+            Amount
+            {initialData.confidence && (
+              <span className="badge badge-success flex items-center gap-sm" style={{ fontSize: '0.75rem', fontWeight: 500 }}>
+                <Sparkles size={12} /> AI Extracted ({(initialData.confidence * 100).toFixed(0)}%)
+              </span>
+            )}
+          </label>
+          <input 
+            type="number" 
+            step="0.01"
+            style={{ ...inputStyle, borderColor: errors.amount ? 'var(--color-danger-text)' : 'var(--color-border)' }}
+            value={formData.amount}
+            onChange={(e) => setFormData({...formData, amount: e.target.value})}
+            placeholder="0.00"
+          />
+          {errors.amount && <span style={{ color: 'var(--color-danger-text)', fontSize: '0.8rem', display: 'block', marginTop: '4px' }}>{errors.amount}</span>}
+        </div>
       </div>
 
       <div className="flex gap-md w-full">

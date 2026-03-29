@@ -35,13 +35,31 @@ export const AppProvider = ({ children }) => {
     }
   };
 
+  const register = async (name, email, password, company_name, country) => {
+    try {
+      const response = await fetch('http://localhost:8000/auth/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, email, password, company_name: company_name || null, country: country || null })
+      });
+      if (response.ok) {
+        // Automatically login
+        return await login(email, password);
+      }
+      return false;
+    } catch(e) {
+      console.error(e);
+      return false;
+    }
+  };
+
   const logout = () => {
     localStorage.removeItem('auth_token');
     setCurrentUser(null);
   };
 
   return (
-    <AppContext.Provider value={{ currentUser, login, logout }}>
+    <AppContext.Provider value={{ currentUser, login, register, logout }}>
       {children}
     </AppContext.Provider>
   );

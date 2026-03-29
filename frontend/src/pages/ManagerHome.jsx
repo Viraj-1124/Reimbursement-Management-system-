@@ -99,8 +99,13 @@ export default function ManagerHome() {
             <div style={{ flex: '1 1 400px', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
                <div className="flex justify-between items-start">
                   <div>
-                    <h2 style={{ margin: '0 0 0.25rem 0' }}>${selectedItem.amount.toFixed(2)}</h2>
-                    <p style={{ margin: 0, color: 'var(--color-text-muted)' }}>{selectedItem.vendor} | {selectedItem.category}</p>
+                    <h2 style={{ margin: '0 0 0.25rem 0' }}>{selectedItem.currency || 'USD'} {selectedItem.amount.toFixed(2)}</h2>
+                    {selectedItem.converted_amount && selectedItem.converted_amount !== selectedItem.amount && (
+                       <p style={{ margin: 0, fontWeight: 600, color: 'var(--color-primary)' }}>
+                         Converted: {selectedItem.converted_amount.toFixed(2)} (Company Match)
+                       </p>
+                    )}
+                    <p style={{ margin: '0.25rem 0 0 0', color: 'var(--color-text-muted)' }}>{selectedItem.vendor} | {selectedItem.category}</p>
                     <p style={{ margin: '0.25rem 0 0 0', fontSize: '0.9rem' }}>Submitted by <strong>{selectedItem.employee_name}</strong> on {selectedItem.date}</p>
                   </div>
                </div>

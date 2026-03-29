@@ -53,6 +53,7 @@ class Expense(Base):
     converted_amount = Column(Float)
 
     category = Column(String)
+    vendor = Column(String)
     description = Column(String)
     date = Column(Date)
 

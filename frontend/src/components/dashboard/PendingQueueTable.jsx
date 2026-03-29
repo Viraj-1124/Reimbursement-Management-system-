@@ -44,7 +44,14 @@ export default function PendingQueueTable({ items, onRowClick }) {
                 <div>{item.vendor}</div>
                 <div style={{ fontSize: '0.8rem', color: 'var(--color-text-muted)' }}>{item.category}</div>
               </td>
-              <td style={{ padding: '1rem', fontWeight: 600 }}>${item.amount.toFixed(2)}</td>
+              <td style={{ padding: '1rem' }}>
+                <div style={{ fontWeight: 600 }}>{item.currency || 'USD'} {item.amount.toFixed(2)}</div>
+                {item.converted_amount && item.converted_amount !== item.amount && (
+                  <div style={{ fontSize: '0.8rem', color: 'var(--color-primary)' }}>
+                    {item.converted_amount.toFixed(2)} (Default)
+                  </div>
+                )}
+              </td>
               <td style={{ padding: '1rem' }}>{getRiskBadge(item.risk_level)}</td>
               <td style={{ padding: '1rem', textAlign: 'right' }}>
                 <ChevronRight size={18} className="text-muted" />

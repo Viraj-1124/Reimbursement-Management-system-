@@ -48,7 +48,7 @@ export default function EmployeeHome() {
       // Refresh list to show new expense at the top
       const newData = await getMyExpenses();
       setExpenses([
-        { id: Math.random(), vendor: formData.vendor, amount: parseFloat(formData.amount), status: "PENDING", date: formData.date },
+        { id: Math.random(), vendor: formData.vendor, amount: parseFloat(formData.amount), currency: formData.currency || 'USD', status: "PENDING", date: formData.date },
         ...newData
       ]);
     } catch (err) {
@@ -132,7 +132,7 @@ export default function EmployeeHome() {
                  <div key={exp.id} className="card flex justify-between items-center" style={{ padding: '1rem' }}>
                    <div>
                      <strong style={{ display: 'block', marginBottom: '4px' }}>{exp.vendor}</strong>
-                     <span className="text-muted" style={{ fontSize: '0.85rem' }}>${exp.amount.toFixed(2)} | {exp.date}</span>
+                     <span className="text-muted" style={{ fontSize: '0.85rem' }}>{exp.currency || 'USD'} {exp.amount.toFixed(2)} | {exp.date}</span>
                    </div>
                    <div>{getStatusBadge(exp.status)}</div>
                  </div>
