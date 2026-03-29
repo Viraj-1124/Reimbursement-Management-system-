@@ -1,0 +1,12 @@
+
+# OCR
+pytesseract==0.3.10
+Pillow==10.3.0
+opencv-python==4.9.0.80
+
+# DB (shared with Person 1)
+SQLAlchemy==2.0.30
+psycopg2-binary==2.9.9
+
+# Utils
+python-dateutil==2.9.0
