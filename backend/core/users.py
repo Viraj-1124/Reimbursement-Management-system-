@@ -18,7 +18,7 @@ def create_employee(db: Session, admin_id: str, data: dict) -> dict:
         email=data.get("email"),
         password_hash=hashed_pwd,
         role=RoleEnum.EMPLOYEE,
-        company_id=data.get("company_id")
+        company_id=str(data.get("company_id")) if data.get("company_id") else None
     )
     db.add(new_employee)
     db.commit()

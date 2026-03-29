@@ -33,7 +33,9 @@ def submit_expense(db: Session, user_id: str, data: dict) -> dict:
     expense_data = {
         "user_id": user_id,
         "amount": new_expense.amount,
-        "category": new_expense.category
+        "converted_amount": new_expense.converted_amount or new_expense.amount,
+        "category": new_expense.category,
+        "date": new_expense.date.isoformat() if new_expense.date else None
     }
     risk_score = risk_score_expense(db, expense_data)
     new_expense.risk_score = risk_score
