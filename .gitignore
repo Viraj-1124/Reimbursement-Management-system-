@@ -1,7 +1,12 @@
 # Python-generated files
 __pycache__/
 *.py[oc]
+*.log
 
 # Virtual environments
 .venv/
 venv/
+
+# Local app data
+reimbursement.db
+frontend/dist/
