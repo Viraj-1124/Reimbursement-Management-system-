@@ -1,7 +1,9 @@
 
+
 # OCR
 pytesseract==0.3.10
 Pillow==10.3.0
+numpy<2                   
 opencv-python==4.9.0.80
 
 # DB (shared with Person 1)
