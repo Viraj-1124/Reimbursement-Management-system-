@@ -57,16 +57,40 @@ def assign_user_manager(employee_id: str, manager_data: ManagerAssign, db: Sessi
 
 # --- EXPENSES ROUTES ---
 
+import os
+import tempfile
+from backend.ai_engine.ocr import process_receipt
+
 @router.post("/expenses/extract")
-def extract_receipt_mock(file: UploadFile = File(...), current_user = Depends(get_current_user)):
+def extract_receipt_live(file: UploadFile = File(...), current_user = Depends(get_current_user)):
+    # 1. Save uploaded file temporarily for OCR processing
+    suffix = os.path.splitext(file.filename)[1] if file.filename else ".png"
+    with tempfile.NamedTemporaryFile(delete=False, suffix=suffix) as tmp:
+        tmp.write(file.file.read())
+        tmp_path = tmp.name
+
+    try:
+        # 2. Run your underlying OCR/OpenCV pipeline
+        ocr_data = process_receipt(tmp_path)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"OCR Engine Failure: {str(e)}")
+    finally:
+        os.unlink(tmp_path)
+        
+    # 3. Format payload to match exact frontend React expectations
+    confidence = ocr_data.get("confidence") or 0.0
+    flags = []
+    if confidence < 0.6:
+        flags.append("Low OCR confidence, manual review required.")
+
     return {
-      "amount": 142.50,
-      "date": "2023-10-24",
-      "vendor": "Delta Airlines",
-      "confidence": 0.94,
-      "flags": ["Date is 6 months old"],
-      "risk_score": 85,
-      "ai_recommendation": "High risk due to old date."
+      "amount": ocr_data.get("amount") or 0.0,
+      "date": ocr_data.get("date") or "",
+      "vendor": ocr_data.get("vendor") or "Unknown Vendor",
+      "confidence": confidence,
+      "flags": flags,
+      "risk_score": 0,  # Actually evaluated when user clicks Submit
+      "ai_recommendation": "Ready for submission." if confidence >= 0.6 else "Please manually verify extracted text."
     }
 
 @router.post("/expenses/submit", status_code=status.HTTP_201_CREATED)

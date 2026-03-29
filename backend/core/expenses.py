@@ -24,11 +24,8 @@ def submit_expense(db: Session, user_id: str, data: dict) -> dict:
         status=StatusEnum.PENDING
     )
     
-    # Optional currency conversion if default currency is different
-    # This might require grabbing the user's company's default currency
     user = db.query(User).filter(User.id == user_id).first()
     if user and user.company_id:
-        # For simplicity, we assume same currency for now, or just leave converted_amount null
         new_expense.converted_amount = data.get("amount")
 
     # Get risk score from AI Engine
@@ -38,15 +35,13 @@ def submit_expense(db: Session, user_id: str, data: dict) -> dict:
         "amount": new_expense.amount,
         "category": new_expense.category
     }
-    risk_score = risk_score_expense(expense_data)
+    risk_score = risk_score_expense(db, expense_data)
     new_expense.risk_score = risk_score
     
     db.add(new_expense)
     db.commit()
     db.refresh(new_expense)
     
-    # We should probably trigger the workflow engine here or separately.
-    # The prompt separates this, so we'll leave it to the router to call create_approval_flow.
     
     return {
         "expense_id": str(new_expense.id),
