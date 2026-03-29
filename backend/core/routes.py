@@ -5,7 +5,7 @@ from .schemas import (
     UserCreate, UserLogin, EmployeeCreate, ManagerAssign, 
     RoleUpdate, ExpenseCreate, ExpenseOut, ApprovalDecision
 )
-from .auth import register_user, login_user
+from .auth import register_user, login_user, get_current_admin, get_current_manager, get_current_user
 from .users import create_employee, assign_manager, update_role
 from .expenses import submit_expense, get_user_expenses
 from .workflow import create_approval_flow, process_approval_step
@@ -33,18 +33,20 @@ def login(user_data: UserLogin, db: Session = Depends(get_db)):
 # --- USERS ROUTES ---
 
 @router.post("/users/create", status_code=status.HTTP_201_CREATED)
-def create_new_employee(admin_id: str, employee_data: EmployeeCreate, db: Session = Depends(get_db)):
+def create_new_employee(employee_data: EmployeeCreate, db: Session = Depends(get_db), current_admin=Depends(get_current_admin)):
     """
-    In a real app, `admin_id` would come from the JWT token via Depends.
-    Passing it as a query param or body field for simplicity based on the prompt signature.
+    Only admins can create new employees.
     """
     try:
-        return create_employee(db, admin_id, employee_data.dict())
+        return create_employee(db, str(current_admin.id), employee_data.dict())
     except PermissionError as e:
         raise HTTPException(status_code=403, detail=str(e))
 
 @router.post("/users/assign-manager")
-def assign_user_manager(employee_id: str, manager_data: ManagerAssign, db: Session = Depends(get_db)):
+def assign_user_manager(employee_id: str, manager_data: ManagerAssign, db: Session = Depends(get_db), current_manager=Depends(get_current_manager)):
+    """
+    Managers and Admins can assign managers.
+    """
     try:
         success = assign_manager(db, employee_id, str(manager_data.manager_id))
         return {"success": success}
