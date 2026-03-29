@@ -1,0 +1,18 @@
+.flex { display: flex; }
+.flex-col { flex-direction: column; }
+.items-center { align-items: center; }
+.justify-center { justify-content: center; }
+.justify-between { justify-content: space-between; }
+.gap-sm { gap: var(--spacing-sm); }
+.gap-md { gap: var(--spacing-md); }
+.gap-lg { gap: var(--spacing-lg); }
+
+.w-full { width: 100%; }
+.h-full { height: 100%; }
+.h-screen { height: 100vh; }
+
+.text-center { text-align: center; }
+.text-muted { color: var(--color-text-muted); }
+
+.mt-md { margin-top: var(--spacing-md); }
+.mb-lg { margin-bottom: var(--spacing-lg); }

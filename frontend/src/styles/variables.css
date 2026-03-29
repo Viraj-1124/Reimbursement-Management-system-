@@ -1,0 +1,41 @@
+:root {
+  /* Clean Enterprise Light Palette */
+  --color-primary: #0A192F;        /* Deep Navy */
+  --color-accent: #0D9488;         /* Teal */
+  --color-accent-hover: #115E59;
+  
+  --color-surface: #FFFFFF;
+  --color-background: #F8FAFC;
+  
+  --color-text-main: #1E293B;
+  --color-text-muted: #64748B;
+  
+  --color-border: #E2E8F0;
+  
+  /* Status/AI Indicator Colors */
+  --color-success-bg: #DCFCE7;
+  --color-success-text: #16A34A;
+  
+  --color-warning-bg: #FEF3C7;
+  --color-warning-text: #D97706;
+  
+  --color-danger-bg: #FEE2E2;
+  --color-danger-text: #DC2626;
+
+  /* Spacing */
+  --spacing-xs: 0.25rem;
+  --spacing-sm: 0.5rem;
+  --spacing-md: 1rem;
+  --spacing-lg: 1.5rem;
+  --spacing-xl: 2rem;
+  --spacing-2xl: 3rem;
+
+  /* Shadow & Radius */
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+}
