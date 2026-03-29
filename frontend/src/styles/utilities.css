@@ -23,3 +23,6 @@
 @keyframes spin {
   100% { transform: rotate(360deg); }
 }
+
+.pb-sm { padding-bottom: var(--spacing-sm); }
+.border-b { border-bottom: 1px solid var(--color-border); }

@@ -3,6 +3,7 @@ import { AppProvider, useAppContext } from './context/AppContext';
 import Login from './pages/Login';
 import EmployeeHome from './pages/EmployeeHome';
 import ManagerHome from './pages/ManagerHome';
+import AdminHome from './pages/AdminHome';
 import Navbar from './components/common/Navbar';
 
 const ProtectedRoute = ({ children, allowedRoles }) => {
@@ -34,7 +35,7 @@ const AppShell = () => {
           } />
           <Route path="/admin" element={
             <ProtectedRoute allowedRoles={['ADMIN']}>
-              <div style={{ padding: '2rem' }}><h2>Admin Settings</h2></div>
+              <AdminHome />
             </ProtectedRoute>
           } />
         </Routes>
